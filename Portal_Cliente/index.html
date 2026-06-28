@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Portal Cliente - EcoRoute</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>EcoRoute</h1>
+    <p>Portal de Clientes</p>
+</header>
+
+<main class="contenedor">
+
+    <section id="login" class="card">
+        <h2>Ingreso Cliente</h2>
+        <p>Ingrese sus datos para revisar el estado de su servicio.</p>
+
+        <input type="text" id="nombreCliente" placeholder="Nombre del cliente">
+        <input type="text" id="rutCliente" placeholder="RUT o correo">
+
+        <button onclick="ingresarCliente()">Ingresar</button>
+    </section>
+
+    <section id="panelCliente" class="oculto">
+
+        <div class="card bienvenida">
+            <h2 id="bienvenida">Bienvenido/a</h2>
+            <p>Fecha de consulta: <span id="fechaActual"></span></p>
+            <button onclick="cambiarModo()">Cambiar modo claro/oscuro</button>
+        </div>
+
+        <div class="menu">
+            <button onclick="mostrarSeccion('inicio')">Inicio</button>
+            <button onclick="mostrarSeccion('seguimiento')">Seguimiento</button>
+            <button onclick="mostrarSeccion('alertas')">Alertas</button>
+            <button onclick="mostrarSeccion('historial')">Historial</button>
+        </div>
+
+        <section id="inicio" class="seccion">
+            <div class="grid">
+                <div class="card">
+                    <h3>🚚 Estado de solicitud</h3>
+                    <p class="estado">En proceso</p>
+                    <p>Tu solicitud fue recibida correctamente.</p>
+                </div>
+
+                <div class="card">
+                    <h3>📍 Ruta asignada</h3>
+                    <p>Ruta Norte - Zona 3</p>
+                    <p>Horario estimado: 15:30 hrs</p>
+                </div>
+
+                <div class="card">
+                    <h3>🌧 Alerta climática</h3>
+                    <p class="alerta">Lluvia moderada</p>
+                    <p>Podrían existir pequeños retrasos.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Acciones</h3>
+                    <button onclick="solicitarRetiro()">Solicitar retiro</button>
+                    <button onclick="verSeguimiento()">Ver seguimiento</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="seguimiento" class="seccion oculto">
+            <div class="card">
+                <h3>Seguimiento del servicio</h3>
+                <p>Progreso del retiro:</p>
+                <progress value="65" max="100"></progress>
+                <p>Vehículo asignado y en camino a la zona indicada.</p>
+            </div>
+        </section>
+
+        <section id="alertas" class="seccion oculto">
+            <div class="card">
+                <h3>Alertas climáticas</h3>
+                <p class="alerta">Lluvia moderada en la zona norte.</p>
+                <p>Recomendación: considerar posibles retrasos en el servicio.</p>
+            </div>
+        </section>
+
+        <section id="historial" class="seccion oculto">
+            <div class="card">
+                <h3>Historial de solicitudes</h3>
+                <ul>
+                    <li>Solicitud #001 - Completada</li>
+                    <li>Solicitud #002 - Completada</li>
+                    <li>Solicitud #003 - En proceso</li>
+                </ul>
+            </div>
+        </section>
+
+    </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
