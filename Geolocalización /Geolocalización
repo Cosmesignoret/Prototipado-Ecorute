@@ -1,1 +1,0 @@
-Integración del requerimiento RF02 para el rastreo de flota. Permite obtener coordenadas exactas en tiempo real utilizando OpenStreetMap (sin requerir API keys). Incluye validaciones de error para evitar caídas de la interfaz si el navegador no soporta la geolocalización.
