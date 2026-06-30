@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>EcoRoute - Cálculo de Viáticos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>EcoRoute AI</h1>
+        <p>Módulo: Cálculo de Viáticos (RF04)</p>
+    </header>
+
+    <main class="contenedor">
+        <section class="tarjeta">
+            <h2>Calcular Viáticos de Ruta</h2>
+            <p>Ingrese los datos del viaje para calcular el dinero de combustible y peajes.</p>
+            
+            <label for="kmRuta">Kilómetros de la Ruta:</label>
+            <input type="number" id="kmRuta" placeholder="Ej. 3000">
+
+            <label for="totalPeajes">Total en Peajes ($):</label>
+            <input type="number" id="totalPeajes" placeholder="Ej. 45000">
+
+            <button onclick="calcularViatico()">Calcular Total</button>
+        </section>
+
+        <section id="panelResultado" class="tarjeta" style="display:none;">
+            <h2>Desglose de Viáticos</h2>
+            <p><strong>Costo Combustible:</strong> $<span id="resCombustible">0</span></p>
+            <p><strong>Total Peajes:</strong> $<span id="resPeajes">0</span></p>
+            <hr>
+            <h3>Total a Transferir: $<span id="resTotal">0</span></h3>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
