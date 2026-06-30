@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoRoute - Panel de Control Operativo Unificado</title>
+    <!-- Vinculación de la hoja de estilos en la misma carpeta raíz -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- CONTENEDOR DE TOASTS -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- CONSOLA DE SIMULACIÓN SUPERIOR (Herramienta de control en presentación) -->
+    <div class="consola-simulador">
+        <strong>Modo Administrador:</strong>
+        <select id="cambiarRol" onchange="bypassModulo(this.value)">
+            <option value="login-view">Pantalla: Inicio de Sesión / Registro</option>
+            <option value="admin-view">Pantalla: Panel de Operaciones (Admin)</option>
+            <option value="cliente-view">Pantalla: Portal de Clientes</option>
+            <option value="viaticos-view">Pantalla: Cálculo de Viáticos</option>
+        </select>
+    </div>
+
+    <!-- BANNER DE ALERTA GLOBAL METEOROLÓGICA -->
+    <div id="bannerAlertaClimatica" class="contenedor oculto">
+        <div id="textoAlertaGlobal"></div>
+        <button onclick="cerrarBanner()" style="background: none; color: inherit; padding: 0; font-size: 18px; border: none; cursor: pointer;">×</button>
+    </div>
+
+    <!-- HEADER UNIFICADO -->
+    <header>
+        <h1 id="headerTitulo">EcoRoute Central</h1>
+        <p id="headerSubtitulo">Empresa logística de transporte con más de 20 años de experiencia a su servicio</p>
+    </header>
+
+    <!-- BARRA DE TAREAS / NAVEGACIÓN (Protegida hasta el login) -->
+    <nav class="barra-tareas">
+        <button class="btn-tarea activo" id="tab-login" onclick="alternarModulo('login-view')">Inicio Sesión / Registro</button>
+        <button class="btn-tarea bloqueado" id="tab-admin" onclick="alternarModuloConSeguridad('admin-view')">Panel de Operaciones 🔒</button>
+        <button class="btn-tarea bloqueado" id="tab-cliente" onclick="alternarModuloConSeguridad('cliente-view')">Portal de Clientes 🔒</button>
+        <button class="btn-tarea bloqueado" id="tab-viaticos" onclick="alternarModuloConSeguridad('viaticos-view')">Cálculo de Viáticos 🔒</button>
+    </nav>
+
+    <main class="contenedor">
+
+        <!-- ==========================================================================
+             SECCIÓN 1A: PANTALLA DE INICIO / LOGIN DE USUARIOS
+             ========================================================================== -->
+        <div id="seccionLogin" class="card">
+            <h2>Ingreso al Sistema de Control</h2>
+            <p>Por favor, ingrese sus credenciales autorizadas de operador logístico o chofer asignado para iniciar la gestión del trayecto.</p>
+            
+            <label for="nombreCliente"><strong>Usuario / Identificador Corporativo:</strong></label>
+            <input type="text" id="nombreCliente" placeholder="Ej: Operador Central Sur-Austral o Conductor" value="Empresa Logística Austral Ltda.">
+            
+            <label for="rutCliente"><strong>RUT de la Empresa o Credencial:</strong></label>
+            <input type="text" id="rutCliente" placeholder="Ej: 76.123.456-7" value="76.123.456-7">
+            
+            <button onclick="ingresarUsuario()" style="width: 100%; margin-top: 10px;">Ingresar de Forma Segura</button>
+            
+            <div style="text-align: center; margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 15px;">
+                <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">¿Es un colaborador nuevo sin credencial activa?</p>
+                <button class="enlace-secundario" onclick="mostrarRegistro(true)">Solicitar alta de cuenta (Empresa o Persona)</button>
+            </div>
+        </div>
+
+        <!-- ==========================================================================
+             SECCIÓN 1B: FORMULARIO DE REGISTRO UNIVERSAL ADAPTATIVO
+             ========================================================================== -->
+        <div id="seccionRegistro" class="card oculto">
+            <h2>Registro de Nuevo Colaborador</h2>
+            <p style="font-size: 14px; margin-bottom: 20px;">Complete los datos del formulario de manera intuitiva para solicitar acceso al panel de operaciones.</p>
+            
+            <label><strong>Seleccione su tipo de perfil en el sistema:</strong></label>
+            <div class="selector-tipo-registro">
+                <div id="btnTipoEmpresa" class="opcion-tipo seleccionada" onclick="seleccionarTipoRegistro('empresa')">
+                    Empresa / Socio Logístico
+                </div>
+                <div id="btnTipoPersona" class="opcion-tipo" onclick="seleccionarTipoRegistro('persona')">
+                    Persona / Conductor / Operador
+                </div>
+            </div>
+            <span class="helper-text">Las empresas coordinan despachos masivos; las personas operan o conducen los vehículos en ruta.</span>
+
+            <!-- Campos Comunes -->
+            <label for="regNombre"><strong>Nombre o Razón Social:</strong></label>
+            <input type="text" id="regNombre" placeholder="Ej: Transportes del Biobío Express S.A. o Juan Pérez">
+            <span class="helper-text" id="helpNombre">Ingrese el nombre oficial de su compañía o su nombre completo.</span>
+
+            <label for="regRUT"><strong>RUT de Identificación:</strong></label>
+            <input type="text" id="regRUT" placeholder="Ej: 77.123.456-K o 18.234.567-8">
+            <span class="helper-text">RUT con guión y dígito verificador. Sin puntos.</span>
+
+            <!-- Bloque Dinámico para Empresas -->
+            <div id="bloqueEmpresa">
+                <label for="regRegion"><strong>Zona Geográfica de Despacho Principal:</strong></label>
+                <select id="regRegion">
+                    <option value="Sur-Austral">Zona Sur-Austral (Santiago - Punta Arenas)</option>
+                    <option value="Central">Zona Central (Valparaíso - Biobío)</option>
+                </select>
+                <span class="helper-text">Región donde concentra la mayor cantidad de movimientos de carga.</span>
+
+                <label for="regFlota"><strong>Estimación de Flota (Camiones):</strong></label>
+                <select id="regFlota">
+                    <option value="mediana">Rango Medio (1 a 50 Camiones)</option>
+                    <option value="grande">Rango Alto (51 a 150 Camiones)</option>
+                </select>
+                <span class="helper-text">Cantidad aproximada de unidades que requiere controlar.</span>
+            </div>
+
+            <!-- Bloque Dinámico para Personas (Conductores / Operadores) -->
+            <div id="bloquePersona" class="oculto">
+                <label for="regRol"><strong>Rol en la Plataforma:</strong></label>
+                <select id="regRol" onchange="toggleLicenciaHelp(this.value)">
+                    <option value="conductor">Conductor de Flota (Chofer de Carretera)</option>
+                    <option value="operador">Operador de Central (Equipo de Oficina)</option>
+                </select>
+                <span class="helper-text">Determine su función para configurar los accesos correspondientes.</span>
+
+                <div id="campoLicencia">
+                    <label for="regLicencia"><strong>Tipo de Licencia de Conducir:</strong></label>
+                    <select id="regLicencia">
+                        <option value="A5">Clase A5 Profesional (Camiones articulados de alta tonelada)</option>
+                        <option value="A4">Clase A4 Profesional (Camiones simples de carga de mediano tonelaje)</option>
+                        <option value="B">Clase B (Vehículos particulares / Soporte ligero)</option>
+                    </select>
+                    <span class="helper-text" id="helpLicencia">Requisito obligatorio: La asignación automatizada evaluará esta clase para coordinar las rutas seguras.</span>
+                </div>
+            </div>
+
+            <button onclick="guardarRegistroSimulado()" style="width: 100%; margin-top: 15px;">Completar Registro e Ingresar</button>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <button class="enlace-secundario" onclick="mostrarRegistro(false)">Cancelar y volver al inicio</button>
+            </div>
+        </div>
+
+        <!-- ==========================================================================
+             SECCIÓN 2: MENÚ DE ACCESO / HUB POST-LOGIN -->
+        <div id="seccionMenuHub" class="card oculto">
+            <h2>Bienvenido</h2>
+            <p>Sesión iniciada con éxito. Seleccione el módulo correspondiente para continuar:</p>
+            
+            <!-- Opción 1: Panel de Operaciones (Admin) -->
+            <div class="opcion-hub" onclick="alternarModuloDirecto('admin-view')">
+                <h3 style="margin: 0; color: #1f6f5b; display: flex; align-items: center; gap: 8px;">
+                    Panel de Operaciones de Despacho <span class="badge badge-verde" style="font-size: 10px;">Administración</span>
+                </h3>
+                <p style="margin: 8px 0 0 0; font-size: 13px; color: #666;">
+                    Permite automatizar la asignación de cargas según la licencia del conductor y emitir alertas climáticas integradas.
+                </p>
+            </div>
+
+            <!-- Opción 2: Portal del Cliente (Teammate) -->
+            <div class="opcion-hub" onclick="alternarModuloDirecto('cliente-view')">
+                <h3 style="margin: 0; color: #2980b9; display: flex; align-items: center; gap: 8px;">
+                    Portal interactivo de Clientes <span class="badge badge-azul" style="font-size: 10px;">Cliente / Socio</span>
+                </h3>
+                <p style="margin: 8px 0 0 0; font-size: 13px; color: #666;">
+                    Permite visualizar el estado del servicio activo, alertas locales de ruta e historial de solicitudes registradas.
+                </p>
+            </div>
+
+            <!-- Opción 3: Cálculo de Viáticos (Teammate) -->
+            <div class="opcion-hub" onclick="alternarModuloDirecto('viaticos-view')">
+                <h3 style="margin: 0; color: #e67e22; display: flex; align-items: center; gap: 8px;">
+                    Cálculo y Desglose Financiero de Viáticos <span class="badge badge-amarillo" style="font-size: 10px;">Finanzas</span>
+                </h3>
+                <p style="margin: 8px 0 0 0; font-size: 13px; color: #666;">
+                    Permite calcular de forma precisa y dinámica el viático del combustible y peajes necesarios para la ruta activa.
+                </p>
+            </div>
+
+            <div style="margin-top: 25px; text-align: center; display: flex; justify-content: center; gap: 15px;">
+                <button onclick="cambiarModo()" style="background: #555; font-size: 13px;">Cambiar Tema Claro/Oscuro</button>
+                <button onclick="cerrarSesion()" style="background: #c62828; font-size: 13px;">Cerrar Sesión</button>
+            </div>
+        </div>
+
+        <!-- ==========================================================================
+             SECCIÓN 3: PANEL DE OPERACIONES (Admin - Asignación y Clima)
+             ========================================================================== -->
+        <div id="panelAdminContenedor" class="oculto">
+            
+            <!-- Resumen Operativo de Flota -->
+            <div class="card" style="background: #1f6f5b; color: white;">
+                <h3>Dashboard de Flota de Despacho (150 Camiones)</h3>
+                <p>Monitoreo activo de la tasa de retraso según eventos climáticos de la ruta.</p>
+                <div style="display: flex; gap: 20px; justify-content: space-around; flex-wrap: wrap; margin-top: 15px;">
+                    <div style="text-align: center;">
+                        <span style="font-size: 28px; font-weight: bold;">150</span><br>Camiones Disponibles
+                    </div>
+                    <div style="text-align: center;">
+                        <span style="font-size: 28px; font-weight: bold; transition: color 0.3s;" id="numRetrasos">0%</span><br>Tasa de Demora Activa
+                    </div>
+                    <div style="text-align: center;">
+                        <span style="font-size: 28px; font-weight: bold;" id="numAlertasMeteorologicas">0</span><br>Alertas Activas
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servicios Meteorológicos -->
+            <section class="card" style="border: 1.5px solid #2c3e50;">
+                <h3 style="color: #2c3e50; margin-top: 0;">
+                    Servicios Meteorológicos Integrados
+                </h3>
+                <p style="font-size: 14px;">Emita alertas dinámicas basadas en la integración satelital para verificar cómo influye el clima en el despacho y sus tiempos de tránsito:</p>
+                
+                <div class="weather-panel-controls">
+                    <button class="btn-weather-alert" style="background: #d9534f;" onclick="emitirAlertaMeteorologica('riesgo')">
+                        Alerta de RIESGO (Nevadas / Bloqueo)
+                    </button>
+                    <button class="btn-weather-alert" style="background: #f0ad4e;" onclick="emitirAlertaMeteorologica('demora')">
+                        Alerta de DEMORA (Neblina / Lluvia)
+                    </button>
+                    <button class="btn-weather-alert" style="background: #0288d1;" onclick="emitirAlertaMeteorologica('eventualidad')">
+                        Alerta de EVENTUALIDAD (Viento en Canal)
+                    </button>
+                    <button class="btn-weather-alert" style="background: #2e7d32;" onclick="emitirAlertaMeteorologica('despejado')">
+                        Restablecer Rutas Despejadas
+                    </button>
+                </div>
+            </section>
+
+            <!-- Asignación Automática -->
+            <section class="card">
+                <h2>Asignación Inteligente de Despachos</h2>
+                <p>Ingrese la información del trayecto para autocompletar la asignación óptima de conductor y camión según su licencia.</p>
+                
+                <div style="background: #fdfefe; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label><strong>📍 Elegir Destino de Entrega:</strong></label>
+                            <select id="destinoSelector" onchange="limpiarAsignacion()">
+                                <option value="punta_arenas">Punta Arenas (Ruta Austral Extrema)</option>
+                                <option value="biobio">Concepción (Región del Biobío)</option>
+                                <option value="los_lagos">Osorno (Región de Los Lagos)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label><strong>Categoría de Carga:</strong></label>
+                            <select id="tipoCargaSelector" onchange="limpiarAsignacion()">
+                                <option value="frio">Carga Refrigerada (Salmón / Alimentos)</option>
+                                <option value="general">Carga General (Mercaderías)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <label><strong>Dirección de Destino:</strong></label>
+                        <input type="text" id="direccionDestino" placeholder="Dirección exacta" value="Ruta 9 Sur, Km 15 - Centro Logístico Punta Arenas">
+                    </div>
+                    
+                    <button onclick="procesarAsignacionAutomatica()" style="margin-top: 15px; width: 100%;">
+                        Ejecutar Asignación Automática y Calcular Tiempos
+                    </button>
+                </div>
+
+                <div id="loaderIA" class="oculto text-center" style="text-align: center; padding: 20px;">
+                    <div class="loader-ia"></div>
+                    <p style="color: #1f6f5b; font-weight: bold; font-size: 14px;">Buscando camión y conductor óptimo en el sistema...</p>
+                </div>
+
+                <div id="resultadoAsignacion" class="oculto" style="border-top: 4px solid #1f6f5b; padding-top: 15px; margin-top: 15px;">
+                    <h3>Propuesta de Despacho Generada</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Conductor Sugerido</th>
+                                <th>Tipo de Camión</th>
+                                <th>Tiempo de Llegada Estimado (ETA)</th>
+                                <th>Estado de Selección</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong id="resConductor">Juan Pérez</strong> <span class="badge badge-azul" id="resLicencia">A5 Profesional</span></td>
+                                <td id="resCamion">Volvo FH16 (Refrigerado)</td>
+                                <td><strong id="resETA" style="color: #2c3e50;">xx/xx/xxxx</strong></td>
+                                <td><span class="badge badge-verde">Asignado</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================================================
+             SECCIÓN 4: PORTAL DE CLIENTES
+             ========================================================================== -->
+        <div id="portalClienteContenedor" class="oculto">
+            
+            <div class="card bienvenida">
+                <h2 id="bienvenidaCliente">Bienvenido/a al Portal del Cliente</h2>
+                <p>Fecha de consulta: <span id="fechaActualCliente"></span></p>
+                <button onclick="cambiarModo()" style="background: #555; font-size: 13px;">Cambiar modo claro/oscuro</button>
+            </div>
+
+            <!-- Menú interno del Portal de Clientes -->
+            <div class="menu-portal">
+                <button onclick="mostrarSubseccionCliente('inicio')">Inicio</button>
+                <button onclick="mostrarSubseccionCliente('seguimiento')">Seguimiento</button>
+                <button onclick="mostrarSubseccionCliente('alertas')">Alertas</button>
+                <button onclick="mostrarSubseccionCliente('historial')">Historial</button>
+            </div>
+
+            <!-- Subsección: Inicio Cliente -->
+            <div id="sub-inicio" class="seccion-cliente">
+                <div class="card">
+                    <h3>Resumen de Servicios Solicitados</h3>
+                    <p><strong>Estado Actual del Envío:</strong> En Ruta Logística</p>
+                    <p><strong>Destino de Carga:</strong> <span id="cliDestino">Ruta 9 Sur, Km 15 - Punta Arenas</span></p>
+                    <p><strong>Camión Asignado:</strong> <span id="cliCamion">Volvo FH16 (Refrigerado)</span></p>
+                    <p><strong>Conductor a Cargo:</strong> <span id="cliConductor">Juan Pérez</span></p>
+                </div>
+
+                <div class="card">
+                    <h3>Acciones del Servicio</h3>
+                    <button onclick="solicitarRetiro()">Solicitar retiro</button>
+                    <button onclick="mostrarSubseccionCliente('seguimiento')" style="background: #2c3e50;">Ver seguimiento satelital</button>
+                </div>
+            </div>
+
+            <!-- Subsección: Seguimiento GPS e Integración OpenStreetMap -->
+            <div id="sub-seguimiento" class="seccion-cliente oculto">
+                <div class="card">
+                    <h3>Seguimiento del Servicio</h3>
+                    <p>Progreso del retiro/despacho en tránsito:</p>
+                    <progress id="progresoCliente" value="65" max="100" style="width: 100%; height: 15px; margin-bottom: 10px;"></progress>
+                    <p id="cliEstadoTexto">Vehículo asignado y en camino a la zona indicada según parámetros de optimización.</p>
+
+                    <!-- Botón para obtener geolocalización real -->
+                    <div style="margin-top: 15px;">
+                        <button onclick="obtenerUbicacionReal()">Obtener mi Geolocalización GPS Real</button>
+                        <div id="mensajeGPS" style="margin-top: 10px; font-weight: bold; color: #165243;"></div>
+                    </div>
+
+                    <!-- Contenedor del Mapa OpenStreetMap Embebido -->
+                    <div id="mapaContenedorOSM" class="mapa-contenedor">
+                        <p style="color: #7f8c8d; font-size: 13px;">[Mapa Satelital de Seguimiento - Presione el botón de arriba para ubicar por GPS]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subsección: Alertas Meteorológicas Locales -->
+            <div id="sub-alertas" class="seccion-cliente oculto">
+                <div class="card">
+                    <h3>Alertas climáticas locales</h3>
+                    <p id="cliAlertaMeteo" class="badge badge-amarillo" style="font-size: 14px; padding: 10px; width: 100%; box-sizing: border-box; text-align: center; margin-bottom: 15px;">
+                        No existen alertas climáticas activas reportadas en las últimas horas.
+                    </p>
+                    <p>Recomendación: Planifique los embarques utilizando los reportes climáticos en tiempo real de la central.</p>
+                </div>
+            </div>
+
+            <!-- Subsección: Historial de Solicitudes -->
+            <div id="sub-historial" class="seccion-cliente oculto">
+                <div class="card">
+                    <h3>Historial de solicitudes</h3>
+                    <ul style="line-height: 1.8;">
+                        <li>Solicitud #001 - Completada (12/04/2026)</li>
+                        <li>Solicitud #002 - Completada (18/04/2026)</li>
+                        <li>Solicitud #003 - En proceso (Servicio Activo)</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==========================================================================
+             SECCIÓN 5: CÁLCULO DE VIÁTICOS
+             ========================================================================== -->
+        <div id="panelViaticosContenedor" class="oculto">
+            <section class="card">
+                <h2>Calcular Viáticos de Ruta</h2>
+                <p>Ingrese los datos reales del viaje para calcular dinámicamente el dinero de combustible y peajes necesarios.</p>
+                
+                <label for="kmRuta">Kilómetros de la Ruta Estimados:</label>
+                <input type="number" id="kmRuta" placeholder="Ej. 3000">
+
+                <label for="totalPeajes">Total en Peajes ($ CLP):</label>
+                <input type="number" id="totalPeajes" placeholder="Ej. 45000">
+
+                <button onclick="calcularViaticosDeFormaReal()" style="width: 100%;">Calcular Viáticos Totales</button>
+            </section>
+
+            <!-- Desglose de Resultados -->
+            <section id="panelResultadoViaticos" class="card oculto" style="border-top: 4px solid #e67e22;">
+                <h2>Desglose de Viáticos Autorizado</h2>
+                <div style="line-height: 1.8; font-size: 15px;">
+                    <p><strong>Costo de Combustible Estimado:</strong> $<span id="resCombustible">0</span> (Valorizado en $250 por Kilómetro)</p>
+                    <p><strong>Total Peajes de Ruta:</strong> $<span id="resPeajes">0</span></p>
+                    <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
+                    <h3 style="color: #d35400;">Total a Transferir: $<span id="resTotal">0</span> CLP</h3>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button onclick="autorizarTransferencia()" style="background: #e67e22;">Aprobar y Transferir Fondos</button>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <footer>
+        EcoRoute Logística - Sistema de Gestión de Operaciones y Monitoreo Climático.
+    </footer>
+
+    <!-- Enlace al archivo JavaScript externo dentro de su respectiva subcarpeta -->
+    <script src="script.js"></script>
+</body>
+</html>
