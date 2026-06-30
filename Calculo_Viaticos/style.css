@@ -1,0 +1,104 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f6f9;
+    margin: 0;
+    color: #222;
+}
+
+header {
+    background: #1f6f5b;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+header h1 {
+    margin: 0;
+}
+
+header p {
+    margin-top: 8px;
+}
+
+.contenedor {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+}
+
+.tarjeta {
+    background: white;
+    padding: 22px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #1f6f5b;
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+button {
+    background: #1f6f5b;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+    width: 100%;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #155346;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+h3 {
+    color: #1f6f5b;
+    text-align: center;
+}
+
+#panelResultado p {
+    font-size: 17px;
+    margin: 12px 0;
+}
+
+#resTotal {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+    .contenedor {
+        width: 95%;
+    }
+
+    .tarjeta {
+        padding: 18px;
+    }
+}

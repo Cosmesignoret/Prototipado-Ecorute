@@ -15,5 +15,5 @@ function calcularViatico() {
     document.getElementById('resPeajes').innerText = peajes.toLocaleString('es-CL');
     document.getElementById('resTotal').innerText = viaticoTotal.toLocaleString('es-CL');
 
-    document.getElementById('panelResultado').style.style.display = 'block';
+    document.getElementById('panelResultado').style.display = 'block';
 }
