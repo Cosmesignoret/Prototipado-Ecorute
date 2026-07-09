@@ -1,0 +1,45 @@
+    
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        /* Estilos personalizados para complementar Tailwind */
+        .brand-gradient {
+            background: linear-gradient(135deg, #1f6f5b 0%, #165243 100%);
+        }
+        .btn-weather-alert {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-weather-alert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Animaciones para alertas críticas */
+        @keyframes alert-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(217, 83, 79, 0); }
+        }
+        .pulse-critical {
+            animation: alert-pulse 2s infinite;
+        }
+        /* Spin de carga */
+        .loader-ia {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1f6f5b;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Estilos del Toast */
+        @keyframes slide-in {
+            from { transform: translateY(100%) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .animate-slide-in {
+            animation: slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
